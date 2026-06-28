@@ -1,0 +1,99 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.userprefs
+*.usertasks
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Logs
+logs/
+*.log
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/repositories.config
+*.nuspec
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## ASP.NET
+wwwroot/dist/
+bundleconfig.json
+
+## dotnet test
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+lcov.info
+
+## Entity Framework migrations temp
+*.mdf
+*.ldf
+*.ndf
+
+## Environment / secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.Production.json
+secrets.json
+
+## Docker
+.dockerignore-local
+
+## File storage (uploaded attachments)
+data/attachments/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Node / Frontend
+node_modules/
+dist/
+.cache/
+.vite/
+*.tsbuildinfo
+
+## IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+## Temporary
+*.tmp
+*.temp
+
+## Tooling / editor local config
+.claude/
+.vscode/settings.json
