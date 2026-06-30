@@ -1,77 +1,78 @@
 # Status do Projeto — DeskFlow
 
-Última atualização: 2026-06-27
+Última atualização: 2026-06-30
 
 ## Funcionalidades Concluídas
 
 - [x] Estrutura de solução .NET 10
 - [x] Projetos: Domain, Application, Infrastructure, Api
 - [x] Projetos de teste: UnitTests, IntegrationTests, ArchitectureTests
-- [x] Referências entre projetos (Clean Architecture)
-- [x] Pacotes NuGet configurados
-- [x] Documentação inicial (architecture.md, security.md, implementation-plan.md)
-- [x] ADRs iniciais
+- [x] Entidades de domínio completas (Ticket, comentários, anexos, histórico, SLA, auditoria, outbox)
+- [x] Máquina de estados com transições e invariantes
+- [x] Value object `TicketNumber`, enums, exceções de domínio
+- [x] Camada Application com handlers para todos os casos de uso de chamados
+- [x] Interfaces de contrato (`IApplicationDbContext`, `IUserService`, `IAuditLogger`, `IFileStorage`, `IEmailSender`)
+- [x] `ApplicationDbContext` com todas as configurações EF Core
+- [x] Migration inicial (`InitialCreate`) gerada
+- [x] `DatabaseSeeder` com dados fictícios (Nexus Tecnologia)
+- [x] `OutboxWorker` para processamento assíncrono de notificações
+- [x] `LocalFileStorage`, `SmtpEmailSender`, `AuditLogService`
+- [x] `ApplicationUser` integrado ao Identity
+- [x] Todos os controllers (Auth, Tickets, Categories, Departments, SlaPolicicies, Users, AuditLogs)
+- [x] Autenticação por cookie (HttpOnly, SameSite, lockout)
+- [x] Antiforgery configurado
+- [x] Rate limiting por política (login, upload, etc.)
+- [x] CORS restrito a origens configuradas
+- [x] Security headers (HSTS, X-Frame-Options, etc.)
+- [x] Problem Details + ExceptionMiddleware
+- [x] Políticas de autorização (`CanManageTickets`, `CanAssignTickets`, etc.)
+- [x] Proteção contra notas internas expostas para Requester (filtro na query)
+- [x] Concorrência otimista via `RowVersion` (retorna HTTP 409)
+- [x] Anexos com validação de extensão, tamanho e hash
+- [x] Docker Compose (SQL Server 2022, Mailpit, API)
+- [x] Dockerfile com multi-stage build e usuário não-root
+- [x] 8 ADRs documentados
+- [x] `README.md`, `.editorconfig`, `.env.example`, `.gitignore`, `.dockerignore`
+- [x] 33 testes unitários de domínio (todos aprovados)
 
-## Funcionalidades em Andamento
+## Funcionalidades Pendentes (Parte 2)
 
-- [ ] Domain: entidades, enums, máquina de estados
-- [ ] Infrastructure: DbContext, migrations, Identity
-- [ ] Api: configuração base, middlewares, health checks
-
-## Funcionalidades Pendentes
-
-- [ ] Endpoints de autenticação
-- [ ] Seed de desenvolvimento
-- [ ] Chamados (CRUD, número amigável, paginação)
-- [ ] Fluxo de atendimento (atribuição, status, concorrência)
-- [ ] Comentários e notas internas
-- [ ] SLA
-- [ ] Anexos
-- [ ] Outbox e notificações
-- [ ] Testes unitários
-- [ ] Testes de integração
-- [ ] Testes de segurança
-- [ ] Testes de arquitetura
-- [ ] Docker Compose completo
-- [ ] Frontend inicial (DeskFlow.Web)
-
-## Bloqueios
-
-Nenhum bloqueio ativo.
+- [ ] Frontend React/Vite (`DeskFlow.Web`)
+- [ ] Testes de integração (Testcontainers)
+- [ ] Testes de arquitetura (NetArchTest)
+- [ ] Testes de segurança automatizados
+- [ ] Dashboard e Kanban
+- [ ] README definitivo com screenshots
+- [ ] CI/CD (GitHub Actions)
 
 ## Limitações Conhecidas
 
-- SLA calculado em horas corridas (sem calendário comercial)
-- Antivírus externo não implementado (roadmap)
-- Frontend (DeskFlow.Web) apenas scaffolding inicial nesta parte
-- Kanban e dashboards finais na Parte 2
+- SLA calculado em horas corridas — sem calendário comercial, feriados ou horário útil
+- Antivírus externo não implementado (registrado no roadmap)
+- Frontend não implementado nesta parte
+- Outbox processa e-mail apenas via Mailpit em Development; SMTP real requer configuração
 
 ## Comandos Executados
 
 ```bash
-dotnet new sln --name DeskFlow
-dotnet new classlib --name DeskFlow.Domain --framework net10.0
-dotnet new classlib --name DeskFlow.Application --framework net10.0
-dotnet new classlib --name DeskFlow.Infrastructure --framework net10.0
-dotnet new webapi --name DeskFlow.Api --framework net10.0
-dotnet new xunit --name DeskFlow.UnitTests --framework net10.0
-dotnet new xunit --name DeskFlow.IntegrationTests --framework net10.0
-dotnet new xunit --name DeskFlow.ArchitectureTests --framework net10.0
-dotnet sln add [todos os projetos]
-dotnet add [referências entre projetos]
-dotnet add package [pacotes NuGet]
+dotnet build                                          # 0 erros
+dotnet ef migrations add InitialCreate \
+  --project src/DeskFlow.Infrastructure \
+  --startup-project src/DeskFlow.Api \
+  --output-dir Persistence/Migrations
+dotnet test tests/DeskFlow.UnitTests                  # 33/33 aprovados
 ```
 
 ## Resultado dos Builds
 
-| Fase      | Status     | Observação                  |
-|-----------|------------|-----------------------------|
-| Estrutura | Pendente   | Aguardando código-fonte      |
+| Fase       | Status    | Observação              |
+|------------|-----------|-------------------------|
+| Completo   | Aprovado  | 0 erros, 24 avisos (NU) |
 
 ## Resultado dos Testes
 
-| Suite              | Total | Passou | Falhou | Pendente |
-|--------------------|-------|--------|--------|----------|
-| UnitTests          | 0     | —      | —      | —        |
-| IntegrationTests   | 0     | —      | —      | —        |
-| ArchitectureTests  | 0     | —      | —      | —        |
+| Suite              | Total | Passou | Falhou |
+|--------------------|-------|--------|--------|
+| UnitTests          | 33    | 33     | 0      |
+| IntegrationTests   | —     | —      | —      |
+| ArchitectureTests  | —     | —      | —      |

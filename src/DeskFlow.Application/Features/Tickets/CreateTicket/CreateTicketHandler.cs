@@ -2,35 +2,32 @@ using DeskFlow.Application.Common;
 using DeskFlow.Application.Contracts;
 using DeskFlow.Domain.Entities;
 using DeskFlow.Domain.Enums;
-using DeskFlow.Infrastructure.Identity;
-using DeskFlow.Infrastructure.Persistence;
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.CreateTicket;
 
 public class CreateTicketHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly ITicketNumberGenerator _numberGenerator;
     private readonly IAuditLogger _audit;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserService _users;
     private readonly TimeProvider _time;
     private readonly IValidator<CreateTicketCommand> _validator;
 
     public CreateTicketHandler(
-        ApplicationDbContext db,
+        IApplicationDbContext db,
         ITicketNumberGenerator numberGenerator,
         IAuditLogger audit,
-        UserManager<ApplicationUser> userManager,
+        IUserService users,
         TimeProvider time,
         IValidator<CreateTicketCommand> validator)
     {
         _db = db;
         _numberGenerator = numberGenerator;
         _audit = audit;
-        _userManager = userManager;
+        _users = users;
         _time = time;
         _validator = validator;
     }
@@ -41,8 +38,7 @@ public class CreateTicketHandler
         if (!validation.IsValid)
             return Result.Failure<Guid>(validation.Errors[0].ErrorMessage);
 
-        var user = await _userManager.FindByIdAsync(cmd.RequesterId.ToString());
-        if (user is null || !user.IsActive)
+        if (!await _users.IsActiveAsync(cmd.RequesterId, ct))
             return Result.Failure<Guid>("User is not active or does not exist.");
 
         var department = await _db.Departments
@@ -78,7 +74,6 @@ public class CreateTicketHandler
 
         _db.Tickets.Add(ticket);
 
-        // Outbox notification: ticket created
         var payload = System.Text.Json.JsonSerializer.Serialize(new
         {
             TicketId = ticket.Id,

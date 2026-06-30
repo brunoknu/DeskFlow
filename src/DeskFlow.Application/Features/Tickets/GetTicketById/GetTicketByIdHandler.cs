@@ -1,15 +1,15 @@
 using DeskFlow.Application.Common;
-using DeskFlow.Infrastructure.Persistence;
+using DeskFlow.Application.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.GetTicketById;
 
 public class GetTicketByIdHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly TimeProvider _time;
 
-    public GetTicketByIdHandler(ApplicationDbContext db, TimeProvider time)
+    public GetTicketByIdHandler(IApplicationDbContext db, TimeProvider time)
     {
         _db = db;
         _time = time;
@@ -31,14 +31,12 @@ public class GetTicketByIdHandler
         if (!query.IsPrivileged && ticket.RequesterId != query.RequestingUserId)
             return Result.Failure<TicketDetailResponse>("Ticket not found.");
 
-        // Load user names efficiently
         var userIds = new HashSet<Guid> { ticket.RequesterId };
         if (ticket.AssignedAgentId.HasValue) userIds.Add(ticket.AssignedAgentId.Value);
         foreach (var c in ticket.Comments) userIds.Add(c.AuthorId);
 
-        var users = await _db.Users
+        var users = await _db.AppUsers
             .Where(u => userIds.Contains(u.Id))
-            .Select(u => new { u.Id, u.FullName })
             .ToDictionaryAsync(u => u.Id, u => u.FullName, ct);
 
         var department = await _db.Departments

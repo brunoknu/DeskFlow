@@ -1,3 +1,5 @@
+using DeskFlow.Application.Common;
+using DeskFlow.Application.Contracts;
 using DeskFlow.Domain.Entities;
 using DeskFlow.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -6,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Infrastructure.Persistence;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
@@ -21,6 +23,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<TicketRating> TicketRatings => Set<TicketRating>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+
+    // IApplicationDbContext: projects ApplicationUser to UserSummary so Application layer
+    // never needs a reference to Infrastructure identity types.
+    public IQueryable<UserSummary> AppUsers =>
+        Users.Select(u => new UserSummary(u.Id, u.FullName, u.IsActive));
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

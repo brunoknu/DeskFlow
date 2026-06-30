@@ -2,18 +2,17 @@ using DeskFlow.Application.Common;
 using DeskFlow.Application.Contracts;
 using DeskFlow.Domain.Entities;
 using DeskFlow.Domain.Exceptions;
-using DeskFlow.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.AddAttachment;
 
 public class AddAttachmentHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly IFileStorage _storage;
     private readonly TimeProvider _time;
 
-    public AddAttachmentHandler(ApplicationDbContext db, IFileStorage storage, TimeProvider time)
+    public AddAttachmentHandler(IApplicationDbContext db, IFileStorage storage, TimeProvider time)
     {
         _db = db;
         _storage = storage;

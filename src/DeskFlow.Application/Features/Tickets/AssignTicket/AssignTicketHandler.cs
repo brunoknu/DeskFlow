@@ -1,30 +1,26 @@
 using DeskFlow.Application.Common;
-using DeskFlow.Domain.Entities;
 using DeskFlow.Application.Contracts;
-using DeskFlow.Domain.Enums;
-using DeskFlow.Infrastructure.Identity;
-using DeskFlow.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Identity;
+using DeskFlow.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.AssignTicket;
 
 public class AssignTicketHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly IAuditLogger _audit;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserService _users;
     private readonly TimeProvider _time;
 
     public AssignTicketHandler(
-        ApplicationDbContext db,
+        IApplicationDbContext db,
         IAuditLogger audit,
-        UserManager<ApplicationUser> userManager,
+        IUserService users,
         TimeProvider time)
     {
         _db = db;
         _audit = audit;
-        _userManager = userManager;
+        _users = users;
         _time = time;
     }
 
@@ -34,19 +30,15 @@ public class AssignTicketHandler
         if (ticket is null)
             return Result.Failure("Ticket not found.");
 
-        // Validate row version for optimistic concurrency
         if (!ticket.RowVersion.SequenceEqual(cmd.RowVersion))
             return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
 
         if (cmd.AgentId.HasValue)
         {
-            var agent = await _userManager.FindByIdAsync(cmd.AgentId.Value.ToString());
-            if (agent is null || !agent.IsActive)
+            if (!await _users.IsActiveAsync(cmd.AgentId.Value, ct))
                 return Result.Failure("Agent not found or is not active.");
 
-            var isAgent = await _userManager.IsInRoleAsync(agent, UserRole.Agent)
-                       || await _userManager.IsInRoleAsync(agent, UserRole.Manager);
-            if (!isAgent)
+            if (!await _users.IsAgentOrManagerAsync(cmd.AgentId.Value, ct))
                 return Result.Failure("User is not an agent or manager.");
         }
 

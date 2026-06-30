@@ -1,20 +1,18 @@
 using DeskFlow.Application.Common;
 using DeskFlow.Application.Contracts;
-using DeskFlow.Domain.Entities;
 using DeskFlow.Domain.Enums;
 using DeskFlow.Domain.Exceptions;
-using DeskFlow.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.CancelTicket;
 
 public class CancelTicketHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly IAuditLogger _audit;
     private readonly TimeProvider _time;
 
-    public CancelTicketHandler(ApplicationDbContext db, IAuditLogger audit, TimeProvider time)
+    public CancelTicketHandler(IApplicationDbContext db, IAuditLogger audit, TimeProvider time)
     {
         _db = db;
         _audit = audit;

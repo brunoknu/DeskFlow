@@ -42,6 +42,8 @@ public static class DependencyInjection
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
+        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITicketNumberGenerator, TicketNumberGenerator>();
         services.AddScoped<IFileStorage, LocalFileStorage>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();

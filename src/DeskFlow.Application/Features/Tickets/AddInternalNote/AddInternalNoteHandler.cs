@@ -1,16 +1,16 @@
 using DeskFlow.Application.Common;
 using DeskFlow.Domain.Exceptions;
-using DeskFlow.Infrastructure.Persistence;
+using DeskFlow.Application.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.AddInternalNote;
 
 public class AddInternalNoteHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly TimeProvider _time;
 
-    public AddInternalNoteHandler(ApplicationDbContext db, TimeProvider time)
+    public AddInternalNoteHandler(IApplicationDbContext db, TimeProvider time)
     {
         _db = db;
         _time = time;

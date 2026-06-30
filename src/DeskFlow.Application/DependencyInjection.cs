@@ -1,3 +1,4 @@
+using DeskFlow.Application.Contracts;
 using DeskFlow.Application.Features.Tickets.AddAttachment;
 using DeskFlow.Application.Features.Tickets.AddInternalNote;
 using DeskFlow.Application.Features.Tickets.AddPublicComment;

@@ -4,6 +4,7 @@ using DeskFlow.Application;
 using DeskFlow.Infrastructure;
 using DeskFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.RateLimiting;
+using Scalar.AspNetCore;
 using Serilog;
 using System.Threading.RateLimiting;
 

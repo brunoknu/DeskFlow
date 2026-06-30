@@ -1,16 +1,15 @@
 using DeskFlow.Application.Common;
 using DeskFlow.Application.Contracts;
-using DeskFlow.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeskFlow.Application.Features.Tickets.GetAttachment;
 
 public class GetAttachmentHandler
 {
-    private readonly ApplicationDbContext _db;
+    private readonly IApplicationDbContext _db;
     private readonly IFileStorage _storage;
 
-    public GetAttachmentHandler(ApplicationDbContext db, IFileStorage storage)
+    public GetAttachmentHandler(IApplicationDbContext db, IFileStorage storage)
     {
         _db = db;
         _storage = storage;
