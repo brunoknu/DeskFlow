@@ -15,7 +15,7 @@ public interface IApplicationDbContext
     DbSet<AuditLog> AuditLogs { get; }
     DbSet<OutboxMessage> OutboxMessages { get; }
 
-    // Projection-only: exposes user data without leaking Infrastructure types into Application.
+    // Projeção dos usuários sem vazar tipos de Infrastructure para a camada Application.
     IQueryable<UserSummary> AppUsers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);

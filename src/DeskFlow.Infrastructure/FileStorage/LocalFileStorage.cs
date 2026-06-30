@@ -22,7 +22,7 @@ public class LocalFileStorage : IFileStorage
         var storedFileName = $"{Guid.NewGuid()}{extension}";
         var storagePath = Path.Combine(_basePath, storedFileName);
 
-        // Prevent path traversal: store only in base path
+        // Proteção contra path traversal: armazena apenas dentro do diretório base.
         var fullPath = Path.GetFullPath(storagePath);
         if (!fullPath.StartsWith(Path.GetFullPath(_basePath), StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Invalid storage path detected.");
@@ -31,7 +31,7 @@ public class LocalFileStorage : IFileStorage
         using (var sha256 = SHA256.Create())
         using (var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.None))
         {
-            // Compute hash while writing to avoid second pass
+            // Calcula o hash durante a escrita para evitar uma segunda leitura do stream.
             using var cryptoStream = new CryptoStream(fs, sha256, CryptoStreamMode.Write);
             await content.CopyToAsync(cryptoStream, ct);
             await cryptoStream.FlushFinalBlockAsync(ct);

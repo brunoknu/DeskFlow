@@ -22,20 +22,19 @@ public class CancelTicketHandler
     public async Task<Result> HandleAsync(CancelTicketCommand cmd, CancellationToken ct)
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
-        if (ticket is null) return Result.Failure("Ticket not found.");
+        if (ticket is null) return Result.Failure("Chamado não encontrado.");
 
         if (!cmd.IsPrivileged)
         {
             if (ticket.RequesterId != cmd.RequestingUserId)
-                return Result.Failure("Ticket not found.");
+                return Result.Failure("Chamado não encontrado.");
 
-            // Requester can only cancel tickets not yet in progress
             if (ticket.Status is not (TicketStatus.New or TicketStatus.Triaged))
-                return Result.Failure("Ticket cannot be cancelled once it is in progress.");
+                return Result.Failure("O chamado não pode ser cancelado após ter sido iniciado.");
         }
 
         if (!ticket.RowVersion.SequenceEqual(cmd.RowVersion))
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
 
         var now = _time.GetUtcNow();
         try
@@ -46,7 +45,7 @@ public class CancelTicketHandler
         catch (DomainException ex) { return Result.Failure(ex.Message); }
         catch (DbUpdateConcurrencyException)
         {
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
         }
 
         await _audit.LogAsync("TicketCancelled", "Ticket", cmd.TicketId.ToString(), cmd.RequestingUserId, ct: ct);

@@ -23,7 +23,7 @@ public class RateTicketHandler
             .FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
 
         if (ticket is null || ticket.RequesterId != cmd.RequesterId)
-            return Result.Failure("Ticket not found.");
+            return Result.Failure("Chamado não encontrado.");
 
         var now = _time.GetUtcNow();
         try

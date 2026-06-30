@@ -9,24 +9,24 @@ public class CreateTicketValidator : AbstractValidator<CreateTicketCommand>
     public CreateTicketValidator()
     {
         RuleFor(x => x.Title)
-            .NotEmpty().WithMessage("Title is required.")
+            .NotEmpty().WithMessage("O título é obrigatório.")
             .MaximumLength(Ticket.TitleMaxLength);
 
         RuleFor(x => x.Description)
-            .NotEmpty().WithMessage("Description is required.")
+            .NotEmpty().WithMessage("A descrição é obrigatória.")
             .MaximumLength(Ticket.DescriptionMaxLength);
 
         RuleFor(x => x.DepartmentId)
-            .NotEmpty().WithMessage("Department is required.");
+            .NotEmpty().WithMessage("O departamento é obrigatório.");
 
         RuleFor(x => x.CategoryId)
-            .NotEmpty().WithMessage("Category is required.");
+            .NotEmpty().WithMessage("A categoria é obrigatória.");
 
         RuleFor(x => x.Priority)
-            .IsInEnum().WithMessage("Invalid priority.");
+            .IsInEnum().WithMessage("Prioridade inválida.");
 
         RuleFor(x => x.CriticalJustification)
-            .NotEmpty().WithMessage("Critical priority requires a justification.")
+            .NotEmpty().WithMessage("Prioridade crítica exige uma justificativa.")
             .When(x => x.Priority == TicketPriority.Critical);
     }
 }

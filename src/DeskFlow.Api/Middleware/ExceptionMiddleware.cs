@@ -28,7 +28,7 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            // Do not expose internal details
+            // Nunca expor detalhes internos ao cliente.
             var correlationId = context.TraceIdentifier;
             _logger.LogError(ex, "Unhandled exception. CorrelationId: {CorrelationId}", correlationId);
             await WriteProblemAsync(context, StatusCodes.Status500InternalServerError,

@@ -22,16 +22,16 @@ public class AddAttachmentHandler
     public async Task<Result<Guid>> HandleAsync(AddAttachmentCommand cmd, CancellationToken ct)
     {
         if (!TicketAttachment.IsExtensionAllowed(cmd.OriginalFileName))
-            return Result.Failure<Guid>("File type not allowed.");
+            return Result.Failure<Guid>("Tipo de arquivo não permitido.");
 
         if (cmd.FileSize > TicketAttachment.MaxFileSizeBytes)
-            return Result.Failure<Guid>($"File exceeds maximum size of {TicketAttachment.MaxFileSizeBytes / 1024 / 1024} MB.");
+            return Result.Failure<Guid>($"O arquivo excede o tamanho máximo de {TicketAttachment.MaxFileSizeBytes / 1024 / 1024} MB.");
 
         var ticket = await _db.Tickets
             .Include(t => t.Attachments)
             .FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
 
-        if (ticket is null) return Result.Failure<Guid>("Ticket not found.");
+        if (ticket is null) return Result.Failure<Guid>("Chamado não encontrado.");
 
         var ext = Path.GetExtension(cmd.OriginalFileName).ToLowerInvariant();
         var now = _time.GetUtcNow();
@@ -49,7 +49,6 @@ public class AddAttachmentHandler
         }
         catch (DomainException ex)
         {
-            // Clean up saved file if domain rule rejected the attachment
             await _storage.DeleteAsync(storagePath, ct);
             return Result.Failure<Guid>(ex.Message);
         }

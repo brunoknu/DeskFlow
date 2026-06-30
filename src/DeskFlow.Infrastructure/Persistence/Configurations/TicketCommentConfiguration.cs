@@ -18,7 +18,7 @@ public class TicketCommentConfiguration : IEntityTypeConfiguration<TicketComment
         builder.Property(c => c.AuthorId).IsRequired();
         builder.Property(c => c.CreatedAtUtc).IsRequired();
 
-        // Internal notes are filtered at query level to prevent accidental disclosure.
+        // Índice composto para filtrar notas internas na query sem exposição acidental.
         builder.HasIndex(c => new { c.TicketId, c.IsInternal });
         builder.HasIndex(c => c.AuthorId);
     }

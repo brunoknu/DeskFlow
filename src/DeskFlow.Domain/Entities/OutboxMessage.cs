@@ -41,7 +41,7 @@ public class OutboxMessage
     public void RecordFailure(string error, DateTimeOffset now)
     {
         AttemptCount++;
-        // Sanitize error to avoid storing sensitive stack traces
+        // Trunca o erro para evitar armazenar stack traces sensíveis.
         LastError = error.Length > 500 ? error[..500] : error;
 
         if (AttemptCount < MaxAttempts)

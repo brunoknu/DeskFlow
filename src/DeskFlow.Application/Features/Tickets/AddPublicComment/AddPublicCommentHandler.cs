@@ -22,21 +22,21 @@ public class AddPublicCommentHandler
     public async Task<Result<Guid>> HandleAsync(AddPublicCommentCommand cmd, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(cmd.Content))
-            return Result.Failure<Guid>("Comment content is required.");
+            return Result.Failure<Guid>("O conteúdo do comentário é obrigatório.");
 
         var ticket = await _db.Tickets
             .Include(t => t.Comments)
             .FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
 
         if (ticket is null)
-            return Result.Failure<Guid>("Ticket not found.");
+            return Result.Failure<Guid>("Chamado não encontrado.");
 
         var now = _time.GetUtcNow();
         try
         {
             var comment = ticket.AddPublicComment(cmd.AuthorId, cmd.Content, now);
 
-            // First public agent comment records the SLA first response
+            // Primeiro comentário público de um agente registra o SLA de primeira resposta.
             if (cmd.AuthorIsAgent)
                 ticket.RecordFirstResponse(now);
 

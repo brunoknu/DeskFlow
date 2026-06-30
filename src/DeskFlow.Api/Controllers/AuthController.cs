@@ -51,11 +51,11 @@ public class AuthController : ControllerBase
 
         await _userManager.AddToRoleAsync(user, UserRole.Requester);
 
-        // In production: send confirmation email via outbox
+        // Em produção: enviar e-mail de confirmação via outbox.
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        _logger.LogInformation("User {Email} registered. Confirmation token generated (not sent in dev).", req.Email);
+        _logger.LogInformation("Usuário {Email} registrado. Token de confirmação gerado (não enviado em dev).", req.Email);
 
-        // Auto-confirm in development for easier testing
+        // Confirmação automática em desenvolvimento para facilitar os testes.
         await _userManager.ConfirmEmailAsync(user, token);
 
         return Created($"/api/users/{user.Id}", new { userId = user.Id });
@@ -69,11 +69,11 @@ public class AuthController : ControllerBase
 
         var user = await _userManager.FindByEmailAsync(req.Email);
 
-        // Neutral response regardless of whether user exists (prevent enumeration)
+        // Resposta neutra independente de o usuário existir — evita enumeração de contas.
         if (user is null || !user.IsActive)
         {
-            await Task.Delay(Random.Shared.Next(100, 300), ct); // timing-safe delay
-            return Unauthorized(new { message = "Invalid credentials." });
+            await Task.Delay(Random.Shared.Next(100, 300), ct); // delay para mitigar timing attacks
+            return Unauthorized(new { message = "Credenciais inválidas." });
         }
 
         var result = await _signInManager.PasswordSignInAsync(
@@ -81,12 +81,12 @@ public class AuthController : ControllerBase
 
         if (result.IsLockedOut)
         {
-            _logger.LogWarning("Account locked out for user {Email}.", req.Email);
-            return StatusCode(429, new { message = "Account temporarily locked. Try again later." });
+            _logger.LogWarning("Conta bloqueada para o usuário {Email}.", req.Email);
+            return StatusCode(429, new { message = "Conta temporariamente bloqueada. Tente novamente mais tarde." });
         }
 
         if (!result.Succeeded)
-            return Unauthorized(new { message = "Invalid credentials." });
+            return Unauthorized(new { message = "Credenciais inválidas." });
 
         user.LastLoginAtUtc = _time.GetUtcNow();
         await _userManager.UpdateAsync(user);
@@ -126,16 +126,16 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest req, CancellationToken ct)
     {
-        // Always return the same response to prevent enumeration
+        // Sempre retornar a mesma resposta para evitar enumeração de contas.
         var user = await _userManager.FindByEmailAsync(req.Email);
         if (user is not null && user.IsActive && await _userManager.IsEmailConfirmedAsync(user))
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            // In production: enqueue outbox message with reset link
-            _logger.LogInformation("Password reset token generated for {Email}.", req.Email);
+            // Em produção: enfileirar mensagem no outbox com o link de redefinição.
+            _logger.LogInformation("Token de redefinição de senha gerado para {Email}.", req.Email);
         }
 
-        return Ok(new { message = "If an account with that email exists, a password reset link has been sent." });
+        return Ok(new { message = "Se existir uma conta com esse e-mail, um link de redefinição de senha foi enviado." });
     }
 
     [HttpPost("reset-password")]

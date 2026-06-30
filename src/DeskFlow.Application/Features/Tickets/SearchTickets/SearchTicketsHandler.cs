@@ -21,7 +21,7 @@ public class SearchTicketsHandler
 
     public async Task<Result<PagedResult<TicketSummaryResponse>>> HandleAsync(SearchTicketsQuery query, CancellationToken ct)
     {
-        if (query.Page < 1) return Result.Failure<PagedResult<TicketSummaryResponse>>("Page must be >= 1.");
+        if (query.Page < 1) return Result.Failure<PagedResult<TicketSummaryResponse>>("A página deve ser maior ou igual a 1.");
         var pageSize = Math.Clamp(query.PageSize, 1, 100);
 
         var q = _db.Tickets.AsNoTracking().AsQueryable();
@@ -51,7 +51,7 @@ public class SearchTicketsHandler
 
         var total = await q.CountAsync(ct);
 
-        // Whitelist sort to prevent injection
+        // Whitelist de ordenação para evitar injeção de campos arbitrários.
         var sortField = AllowedSortFields.Contains(query.SortBy) ? query.SortBy : "CreatedAtUtc";
         q = (sortField, query.SortDescending) switch
         {

@@ -230,7 +230,7 @@ public class TicketsController : ControllerBase
         if (!result.IsSuccess) return NotFound(new { message = result.Error });
 
         var download = result.Value!;
-        // Sanitize filename to prevent header injection
+        // Sanitiza o nome do arquivo para evitar injeção de cabeçalho HTTP.
         var safeFileName = System.Net.WebUtility.UrlEncode(download.OriginalFileName);
         Response.Headers.ContentDisposition = $"attachment; filename*=UTF-8''{safeFileName}";
         return File(download.Content, download.ContentType);
@@ -250,7 +250,7 @@ public class TicketsController : ControllerBase
     }
 }
 
-// Request DTOs — specific per operation to prevent mass assignment
+// DTOs de entrada — um por operação para evitar mass assignment.
 public sealed record CreateTicketRequest(
     string Title, string Description, Guid DepartmentId, Guid CategoryId,
     TicketPriority Priority, string? CriticalJustification);

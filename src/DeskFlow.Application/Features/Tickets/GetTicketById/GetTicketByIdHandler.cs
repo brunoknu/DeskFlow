@@ -25,11 +25,11 @@ public class GetTicketByIdHandler
             .FirstOrDefaultAsync(t => t.Id == query.TicketId, ct);
 
         if (ticket is null)
-            return Result.Failure<TicketDetailResponse>("Ticket not found.");
+            return Result.Failure<TicketDetailResponse>("Chamado não encontrado.");
 
-        // Requesters can only see their own tickets
+        // Notas internas são filtradas na query para evitar exposição acidental.
         if (!query.IsPrivileged && ticket.RequesterId != query.RequestingUserId)
-            return Result.Failure<TicketDetailResponse>("Ticket not found.");
+            return Result.Failure<TicketDetailResponse>("Chamado não encontrado.");
 
         var userIds = new HashSet<Guid> { ticket.RequesterId };
         if (ticket.AssignedAgentId.HasValue) userIds.Add(ticket.AssignedAgentId.Value);
@@ -51,7 +51,6 @@ public class GetTicketByIdHandler
 
         var now = _time.GetUtcNow();
 
-        // Internal notes are filtered at query level to prevent accidental disclosure.
         var visibleComments = ticket.Comments
             .Where(c => !c.IsInternal || query.IsPrivileged)
             .Select(c => new CommentResponse(

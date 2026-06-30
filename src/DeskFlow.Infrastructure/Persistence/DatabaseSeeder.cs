@@ -187,7 +187,7 @@ public class DatabaseSeeder
 
         await _db.SaveChangesAsync();
 
-        // Assign ticket 1 and transition to InProgress
+        // Atribui e inicia o ticket 1 para simular fluxo em andamento.
         t1.Transition(TicketStatus.Triaged, agent1.Id, now.AddMinutes(5));
         t1.Assign(agent1.Id, agent1.Id, now.AddMinutes(6));
         t1.Transition(TicketStatus.InProgress, agent1.Id, now.AddMinutes(7));

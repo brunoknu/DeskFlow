@@ -23,10 +23,10 @@ public class ChangeTicketStatusHandler
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
         if (ticket is null)
-            return Result.Failure("Ticket not found.");
+            return Result.Failure("Chamado não encontrado.");
 
         if (!ticket.RowVersion.SequenceEqual(cmd.RowVersion))
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
 
         var now = _time.GetUtcNow();
         try
@@ -49,7 +49,7 @@ public class ChangeTicketStatusHandler
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
         }
 
         await _audit.LogAsync("TicketStatusChanged", "Ticket", cmd.TicketId.ToString(),

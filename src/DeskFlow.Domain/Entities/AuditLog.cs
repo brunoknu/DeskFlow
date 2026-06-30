@@ -37,7 +37,7 @@ public class AuditLog
             ActorUserId = actorUserId,
             OccurredAtUtc = occurredAtUtc,
             CorrelationId = correlationId,
-            // Store only last 3 octets to partially anonymize (e.g., "192.168.1.***")
+            // Armazena apenas os 3 primeiros octetos para anonimização parcial (ex.: "192.168.1.***").
             IpAddress = AnonymizeIp(ipAddress),
             Metadata = metadata
         };
@@ -49,7 +49,7 @@ public class AuditLog
         var parts = ip.Split('.');
         if (parts.Length == 4)
             return $"{parts[0]}.{parts[1]}.{parts[2]}.*";
-        // IPv6: keep first 4 groups
+        // IPv6: mantém os primeiros 4 grupos.
         var v6Parts = ip.Split(':');
         if (v6Parts.Length >= 4)
             return string.Join(":", v6Parts[..4]) + ":***";

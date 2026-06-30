@@ -28,18 +28,18 @@ public class AssignTicketHandler
     {
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
         if (ticket is null)
-            return Result.Failure("Ticket not found.");
+            return Result.Failure("Chamado não encontrado.");
 
         if (!ticket.RowVersion.SequenceEqual(cmd.RowVersion))
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
 
         if (cmd.AgentId.HasValue)
         {
             if (!await _users.IsActiveAsync(cmd.AgentId.Value, ct))
-                return Result.Failure("Agent not found or is not active.");
+                return Result.Failure("Agente não encontrado ou inativo.");
 
             if (!await _users.IsAgentOrManagerAsync(cmd.AgentId.Value, ct))
-                return Result.Failure("User is not an agent or manager.");
+                return Result.Failure("O usuário não possui perfil de agente ou gestor.");
         }
 
         var now = _time.GetUtcNow();
@@ -59,7 +59,7 @@ public class AssignTicketHandler
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
         }
 
         await _audit.LogAsync("TicketAssigned", "Ticket", cmd.TicketId.ToString(), cmd.ChangedByUserId, ct: ct);

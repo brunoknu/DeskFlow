@@ -21,9 +21,8 @@ public class GetAttachmentHandler
             .FirstOrDefaultAsync(a => a.Id == query.AttachmentId && a.TicketId == query.TicketId, ct);
 
         if (attachment is null)
-            return Result.Failure<AttachmentDownloadResult>("Attachment not found.");
+            return Result.Failure<AttachmentDownloadResult>("Anexo não encontrado.");
 
-        // Verify requester owns the ticket or is privileged
         if (!query.IsPrivileged)
         {
             var ticket = await _db.Tickets
@@ -32,7 +31,7 @@ public class GetAttachmentHandler
                 .FirstOrDefaultAsync(ct);
 
             if (ticket is null || ticket.RequesterId != query.RequestingUserId)
-                return Result.Failure<AttachmentDownloadResult>("Attachment not found.");
+                return Result.Failure<AttachmentDownloadResult>("Anexo não encontrado.");
         }
 
         var stream = await _storage.ReadAsync(attachment.StoragePath, ct);

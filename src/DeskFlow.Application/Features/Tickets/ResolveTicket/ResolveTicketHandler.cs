@@ -22,13 +22,13 @@ public class ResolveTicketHandler
     public async Task<Result> HandleAsync(ResolveTicketCommand cmd, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(cmd.ResolutionSummary))
-            return Result.Failure("Resolution summary is required.");
+            return Result.Failure("O resumo da resolução é obrigatório.");
 
         var ticket = await _db.Tickets.FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
-        if (ticket is null) return Result.Failure("Ticket not found.");
+        if (ticket is null) return Result.Failure("Chamado não encontrado.");
 
         if (!ticket.RowVersion.SequenceEqual(cmd.RowVersion))
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
 
         var now = _time.GetUtcNow();
         try
@@ -48,7 +48,7 @@ public class ResolveTicketHandler
         catch (DomainException ex) { return Result.Failure(ex.Message); }
         catch (DbUpdateConcurrencyException)
         {
-            return Result.Failure("Ticket was modified by another user. Please refresh and try again.");
+            return Result.Failure("O chamado foi alterado por outro usuário. Atualize a página e tente novamente.");
         }
 
         await _audit.LogAsync("TicketResolved", "Ticket", cmd.TicketId.ToString(), cmd.ChangedByUserId, ct: ct);

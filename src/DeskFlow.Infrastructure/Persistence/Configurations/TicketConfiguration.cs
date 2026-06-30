@@ -36,12 +36,12 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
         builder.Property(t => t.ResolutionDueAtUtc).IsRequired();
         builder.Property(t => t.ReopenCount).IsRequired().HasDefaultValue(0);
 
-        // Concurrency token
+        // Token de concorrência otimista.
         builder.Property(t => t.RowVersion)
             .IsRowVersion()
             .IsConcurrencyToken();
 
-        // Navigation: ignore private backing fields and expose through public IReadOnlyList
+        // Acessa as coleções pelos campos privados de backing, expondo-as via IReadOnlyList.
         builder.Navigation(t => t.Comments).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Navigation(t => t.Attachments).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Navigation(t => t.StatusHistory).UsePropertyAccessMode(PropertyAccessMode.Field);
@@ -72,7 +72,7 @@ public class TicketConfiguration : IEntityTypeConfiguration<Ticket>
             .HasForeignKey<TicketRating>(r => r.TicketId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Indexes
+        // Índices
         builder.HasIndex(t => t.Number).IsUnique();
         builder.HasIndex(t => t.Status);
         builder.HasIndex(t => t.Priority);

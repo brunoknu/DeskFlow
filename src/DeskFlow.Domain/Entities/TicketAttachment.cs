@@ -74,9 +74,9 @@ public class TicketAttachment
 
     private static string SanitizeFileName(string fileName)
     {
-        // Keep only the file name, strip path components (path traversal protection)
+        // Extrai apenas o nome do arquivo, removendo componentes de caminho (proteção contra path traversal).
         var name = Path.GetFileName(fileName);
-        // Replace any remaining unsafe characters
+        // Substitui caracteres inválidos restantes.
         foreach (var c in Path.GetInvalidFileNameChars())
             name = name.Replace(c, '_');
         return name;

@@ -39,23 +39,23 @@ public class CreateTicketHandler
             return Result.Failure<Guid>(validation.Errors[0].ErrorMessage);
 
         if (!await _users.IsActiveAsync(cmd.RequesterId, ct))
-            return Result.Failure<Guid>("User is not active or does not exist.");
+            return Result.Failure<Guid>("Usuário inativo ou não encontrado.");
 
         var department = await _db.Departments
             .FirstOrDefaultAsync(d => d.Id == cmd.DepartmentId && d.IsActive, ct);
         if (department is null)
-            return Result.Failure<Guid>("Department not found.");
+            return Result.Failure<Guid>("Departamento não encontrado.");
 
         var category = await _db.TicketCategories
             .FirstOrDefaultAsync(c => c.Id == cmd.CategoryId && c.IsActive, ct);
         if (category is null)
-            return Result.Failure<Guid>("Category not found.");
+            return Result.Failure<Guid>("Categoria não encontrada.");
 
         var sla = await _db.SlaPolicies
             .Where(s => s.Priority == cmd.Priority && s.IsActive)
             .FirstOrDefaultAsync(ct);
         if (sla is null)
-            return Result.Failure<Guid>($"No active SLA policy found for priority '{cmd.Priority}'.");
+            return Result.Failure<Guid>($"Nenhuma política de SLA ativa encontrada para a prioridade '{cmd.Priority}'.");
 
         var now = _time.GetUtcNow();
         var number = await _numberGenerator.GenerateAsync(ct);

@@ -122,7 +122,7 @@ public class OutboxWorker : BackgroundService
             case "TicketCommentAdded":
             case "TicketReopened":
             case string s when s.StartsWith("TicketStatus_"):
-                // Additional notification types — implement as needed
+                // Demais tipos de notificação — implementar conforme necessário.
                 break;
 
             default:

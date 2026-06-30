@@ -24,8 +24,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
-    // IApplicationDbContext: projects ApplicationUser to UserSummary so Application layer
-    // never needs a reference to Infrastructure identity types.
+    // Projeta ApplicationUser para UserSummary evitando que a camada Application dependa de tipos de Identity.
     public IQueryable<UserSummary> AppUsers =>
         Users.Select(u => new UserSummary(u.Id, u.FullName, u.IsActive));
 

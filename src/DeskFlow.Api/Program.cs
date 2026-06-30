@@ -10,7 +10,7 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Serilog
+// Configuração do Serilog
 builder.Host.UseSerilog((ctx, lc) => lc
     .ReadFrom.Configuration(ctx.Configuration)
     .Enrich.FromLogContext()
@@ -23,7 +23,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Cookie auth + antiforgery
+// Autenticação por cookie + antiforgery
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
@@ -49,14 +49,14 @@ builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-XSRF-TOKEN";
     options.Cookie.Name = "XSRF-TOKEN";
-    options.Cookie.HttpOnly = false; // must be readable by JS to send in header
+    options.Cookie.HttpOnly = false; // precisa ser lido pelo JS para enviar no header
     options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
-// Authorization policies
+// Políticas de autorização
 builder.Services.AddAuthorization(AuthorizationPolicies.Configure);
 
-// CORS — restrict to configured origins
+// CORS — restrito às origens configuradas
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
@@ -75,7 +75,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Rate limiting
+// Rate limiting por política
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -121,7 +121,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Security headers
+// Cabeçalhos de segurança
 app.Use(async (context, next) =>
 {
     context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
@@ -156,7 +156,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
-// Seed in development
+// Seed de dados em desenvolvimento
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -166,5 +166,5 @@ if (app.Environment.IsDevelopment())
 
 app.Run();
 
-// Expose for integration tests
+// Exposto para testes de integração
 public partial class Program { }

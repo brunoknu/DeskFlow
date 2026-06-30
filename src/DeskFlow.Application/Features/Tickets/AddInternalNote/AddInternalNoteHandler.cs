@@ -19,13 +19,13 @@ public class AddInternalNoteHandler
     public async Task<Result<Guid>> HandleAsync(AddInternalNoteCommand cmd, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(cmd.Content))
-            return Result.Failure<Guid>("Note content is required.");
+            return Result.Failure<Guid>("O conteúdo da nota interna é obrigatório.");
 
         var ticket = await _db.Tickets
             .Include(t => t.Comments)
             .FirstOrDefaultAsync(t => t.Id == cmd.TicketId, ct);
 
-        if (ticket is null) return Result.Failure<Guid>("Ticket not found.");
+        if (ticket is null) return Result.Failure<Guid>("Chamado não encontrado.");
 
         var now = _time.GetUtcNow();
         try

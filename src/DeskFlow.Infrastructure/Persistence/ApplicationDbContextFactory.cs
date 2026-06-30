@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace DeskFlow.Infrastructure.Persistence;
 
-// Used only by EF Core tooling (dotnet ef migrations add).
-// Not registered in DI.
+// Usado apenas pelo tooling do EF Core (dotnet ef migrations add). Não registrado no DI.
 public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
 {
     public ApplicationDbContext CreateDbContext(string[] args)
